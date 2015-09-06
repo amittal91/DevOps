@@ -54,3 +54,11 @@
 * `git revert HEAD`
 
 ![bonus](https://cloud.githubusercontent.com/assets/9273776/9706545/bd3f78e4-54b5-11e5-85d2-73b69aeada31.png)
+
+##Hooks
+
+####post-commit script
+
+`gnome-open https://www.google.com`
+
+NOTE: Used `chmod +x` to make the file executable.
