@@ -52,3 +52,5 @@
 * `git reset HEAD^`
 * `git checkout pushed`
 * `git revert HEAD`
+
+![level2](https://cloud.githubusercontent.com/assets/9273776/9706506/1a50b4cc-54b5-11e5-965c-9994dda3cc43.png)
