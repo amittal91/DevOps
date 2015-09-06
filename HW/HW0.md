@@ -29,6 +29,8 @@
 * `git checkout bugFix`
 * `git rebase master`
 
+![level](https://cloud.githubusercontent.com/assets/9273776/9706503/0761c356-54b5-11e5-81d9-4420df8c2cd6.png)
+
 ##Git Bonus
 
 ####Level 1 - Detach yo' HEAD
