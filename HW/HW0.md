@@ -4,8 +4,8 @@
 
 ####Level 1 - Introduction to git commits
 
-* `git commit` 
-* `git commit`
+* `git commit "Commit 1"` 
+* `git commit "Commit 2"`
 
 ####Level 2 - Branching in git
 
@@ -15,17 +15,17 @@
 ####Level 3 - Merging in git
 
 * `git checkout -b bugFix`
-* `git commit`
+* `git commit "Commit for bugFix"`
 * `git checkout master`
-* `git commit`
+* `git commit "Commit for master"`
 * `git merge bugFix`
 
 ####Level 4 - Rebase introduction
 
 * `git checkout -b bugFix`
-* `git commit`
+* `git commit "Commit for bugFix"`
 * `git checkout master`
-* `git commit`
+* `git commit "Commit for master"`
 * `git checkout bugFix`
 * `git rebase master`
 
