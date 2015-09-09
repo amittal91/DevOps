@@ -58,9 +58,9 @@
 ##Hooks
 
 ####post-commit script
-
 ```
-#Open web browser and go to the specified url after git commit
 gnome-open https://www.google.com`
 ```
 NOTE: Used `chmod +x` to make the file executable.
+
+Link to [**Screencast**](https://youtu.be/ggeLxrJyGko)
