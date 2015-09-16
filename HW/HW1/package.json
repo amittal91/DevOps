@@ -1,0 +1,15 @@
+{
+  "name": "digitalocean",
+  "version": "1.0.0",
+  "description": "HW1 digitalocean DevOps",
+  "main": "digitalocean.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "needle": "^0.7.10",
+    "aws-sdk": "^2.2.1"
+  }
+}
