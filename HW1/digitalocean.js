@@ -147,10 +147,11 @@ client.listRegions(function(error, response)
 							}
 							console.log("IP Address: ", dropletIp);
 
-							var ansibleInventory = name + " ansible_ssh_host=" + dropletIp
+							var ansibleInventory = "\n" + name + " ansible_ssh_host=" + dropletIp
 												 + " ansible_ssh_user=" +  dropletUserName
 												 + " ansible_ssh_private_key_file=" + pathToSsh ;
-							fs.appendFile('inventory',ansibleInventory)
+							fs.writeFile('inventory','[droplets]');
+							fs.appendFile('inventory',ansibleInventory);
 							flag = 1;	
 						}
 					}
