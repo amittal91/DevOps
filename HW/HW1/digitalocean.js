@@ -139,10 +139,9 @@ client.listRegions(function(error, response)
 							console.log("Region: ",region);
 							console.log("Image: ", image);
 
-							var pathToKey = "/home/apoorv/.ssh/id_rsa";
 							var ansibleInventory = "\n" + name + " ansible_ssh_host=" + dropletIp
 												 + " ansible_ssh_user=" +  dropletUserName
-												 + " ansible_ssh_private_key_file=" + pathToKey ;
+												 + " ansible_ssh_private_key_file=" + process.env.KEYPATH ;
 							console.log("\nWriting to inventory file....");
 							fs.writeFile('inventory','[droplets]');
 							fs.appendFile('inventory',ansibleInventory);
