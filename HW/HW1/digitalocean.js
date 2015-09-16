@@ -1,9 +1,11 @@
 var needle = require("needle");
 var fs = require("fs");
+require('./env.js')
+
 
 
 var config = {};
-config.token = "db983f935e1ca03ebb53fcda1c31e95ddbd06fdfd744a1cf5978b7e402b88a26";
+config.token = process.env.TOKEN;
 
 var headers =
 {
@@ -35,7 +37,7 @@ var client =
 			"size":"512mb",
 			"image":imageName,
 			// Id to ssh_key already associated with account.
-			"ssh_keys":[1297132],
+			"ssh_keys":[process.env.SSHKEY],
 			//"ssh_keys":null,
 			"backups":false,
 			"ipv6":false,
