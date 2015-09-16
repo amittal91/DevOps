@@ -1,3 +1,0 @@
-[droplets]
-amittal-1442376743948 ansible_ssh_host=198.211.104.21 ansible_ssh_user=root ansible_ssh_private_key_file=/home/apoorv/.ssh/id_rsa
-amittal-aws-1442381555198 ansible_ssh_host=54.172.36.152 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/home/apoorv/.ssh/id_rsa
