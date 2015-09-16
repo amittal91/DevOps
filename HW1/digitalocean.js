@@ -109,7 +109,8 @@ client.listRegions(function(error, response)
 				}
 			}
 		}
-
+		//coreOs doesn't work with ansible. Python issues.
+		image = "ubuntu-14-04-x64";
 		var d = new Date();
 		var n = d.getTime(); 
 		var name = "amittal-"+n;
@@ -135,135 +136,34 @@ client.listRegions(function(error, response)
 						{
 							console.log("Droplet Created!")
 							dropletIp = data.droplet["networks"]["v4"][0]["ip_address"];
+							if ( data.droplet["image"]["distribution"] == "CoreOS" )
+							{
+								dropletUserName = "core";
+							}
+
+							else
+							{
+								dropletUserName = "root";
+							}
+							console.log("IP Address: ", dropletIp);
+
+							var ansibleInventory = name + " ansible_ssh_host=" + dropletIp
+												 + " ansible_ssh_user=" +  dropletUserName
+												 + " ansible_ssh_private_key_file=" + pathToSsh ;
+							fs.appendFile('inventory',ansibleInventory)
 							flag = 1;	
 						}
-
-						
-						if ( data.droplet["image"]["distribution"] == "CoreOS" )
-						{
-							dropletUserName = "core";
-						}
-
-						else
-						{
-							dropletUserName = "root";
-						}
-						console.log("IP Address: ", dropletIp);
-
 					}
 
-					var ansibleInventory = name + " ansible_ssh_host=" + dropletIp
-										 + " ansible_ssh_user=" +  dropletUserName
-										 + " ansible_ssh_private_key_file" + pathToSsh ;
-					fs.appendFile('inventory',ansibleInventory)
+
 					if( flag == 1 )
 					{
 						clearInterval(timeoutForIp);
 					}
-
-
 				})
 			},1000);
 		});		
 	});
 });
 
-
-// #############################################
-// #2 Extend the client object to have a listImages method
-// Comment out when completed.
-// https://developers.digitalocean.com/#images
-// - Print out a list of available system images, that are AVAILABLE in a specified region.
-// - use 'slug' property
-/*client.listImages(function(error, response)
-{
-	var data = response.body;
-	var flag = 0 ;
-	if( data.images )
-	{
-		for(var i=0; i<data.images.length; i++)
-		{
-			if( flag == 1 ) {
-				break;
-			}
-
-			else {
-				
-				for(var j=0; j<data.images[i]["regions"].length; j++)
-				{
-					if (data.images[i]["regions"][j] == region) {
-						
-						image = data.images[i]["slug"];
-						console.log("Image: ", image);
-						flag = 1;
-						break;
-					}
-				}
-			}
-		}
-	}
-});*/
-
-// #############################################
-// #3 Create an droplet with the specified name, region, and image
-// Comment out when completed. ONLY RUN ONCE!!!!!
-// Write down/copy droplet id.
-
-// var region = "fra1"; // Fill one in from #1
-// var image = "centos-7-0-x64"; // Fill one in from #2
-/*client.createDroplet(name, region, image, function(err, resp, body)
-{
-	console.log(body);
-	// StatusCode 202 - Means server accepted request.
-	if(!err && resp.statusCode == 202)
-	{
-		console.log( JSON.stringify( body, null, 3 ) );
-	}
-});*/
-
-// #############################################
-// #4 Extend the client to retrieve information about a specified droplet.
-// Comment out when done.
-// https://developers.digitalocean.com/#retrieve-an-existing-droplet-by-id
-// REMEMBER POST != GET
-// Most importantly, print out IP address!
-// var dropletId = "6882027";
-/*client.getDroplet(dropletId, function(error, response)
-{
-	var data = response.body;
-	var networks = data.droplet["networks"]["v4"]
-	if ( data.droplet )
-	{
-		for(var i=0; i<networks.length; i++)
-		{
-			console.log("IP Address: ", networks[i]["ip_address"]);
-		}
-	}
-});
-*/
-// #############################################
-// #5 In the command line, ping your server, make sure it is alive!
-// ping 46.101.229.135
-
-// #############################################
-// #6 Extend the client to DESTROY the specified droplet.
-// Comment out when done.
-// https://developers.digitalocean.com/#delete-a-droplet
-// HINT, use the DELETE verb.
-// HINT #2, needle.delete(url, data, options, callback), data needs passed as null.
-// No response body will be sent back, but the response code will indicate success.
-// Specifically, the response code will be a 204, which means that the action was successful with no returned body data.
-// var dropletId = "6882027";
-// client.deleteDroplet(dropletId, function(error, response)
-// {
-
-// 	if(!error && response.statusCode == 204)
-// 	{
-// 			console.log("Deleted!");
-// 	}
-// });
-// #############################################
-// #7 In the command line, ping your server, make sure it is dead!
-// ping 46.101.229.135
-// It could be possible that digitalocean reallocated your IP address to another server, so don't fret it is still pinging.
 
