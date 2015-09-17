@@ -14,6 +14,10 @@
 1. Run ./amittal-HW1.js on your terminal
 2. Go to http://IP_ADDRESS/ to check if nginx is installed.
 
+### Screencast
+
+- [Screencast Link] (https://youtu.be/ISYDgD9RW80)
+
 ### References
 
 * http://docs.aws.amazon.com/AWSJavaScriptSDK/guide/node-intro.html
