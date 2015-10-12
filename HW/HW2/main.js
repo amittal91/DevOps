@@ -74,8 +74,9 @@ var mockFileLibrary =
 var permArr = [],
   usedChars = [];
 
-function cartesianProductOf(list) {
-    return _.reduce(list, function(a, b) {
+// Reference : Stack Overflow
+function cartesianProductOf(argument) {
+    return _.reduce(argument, function(a, b) {
         return _.flatten(_.map(a, function(x) {
             return _.map(b, function(y) {
                 return x.concat([y]);
@@ -83,6 +84,26 @@ function cartesianProductOf(list) {
         }), true);
     }, [ [] ]);
 };
+
+function padNumber(number) {
+    var numLength = number.length;
+    padDigits = 3 - (numLength % 3);
+    numberString = number.toString();
+    if (padDigits == 1)
+    {
+        var result = "0" + numberString;
+        return result;
+    }
+
+    else if (padDigits == 2)
+    {
+        var result = "00" + numberString;
+        return result;
+    }
+
+    else
+        return numberString;
+}
 
 function generateTestCases()
 {
@@ -93,6 +114,7 @@ function generateTestCases()
     {
         var params = {};
 
+        console.log (funcName)
         // initialize params
         for (var i =0; i < functionConstraints[funcName].params.length; i++ )
         {
@@ -107,7 +129,7 @@ function generateTestCases()
         // Handle global constraints...
         var fileWithContent = _.some(constraints, {kind: 'fileWithContent' });
         var pathExists      = _.some(constraints, {kind: 'fileExists' });
-
+        var phone = _.contains(functionConstraints[funcName].params, "phoneNumber");
         var arglist = [];
         // plug-in values for parameters
         for( var c = 0; c < constraints.length; c++ )
@@ -121,7 +143,11 @@ function generateTestCases()
                 params[constraint.ident].push(constraint.value);
             }
 
-            var list = [];
+            
+        }
+
+        var args = Object.keys(params).map( function(k) {return "["+ params[k]+ "]"; }).join(",");
+        var list = [];
             
             for (var key in params )
             {
@@ -134,10 +160,8 @@ function generateTestCases()
             {
                 content += "subject.{0}({1});\n".format(funcName, combination[i] );    
             }
-        }
 
-
-        var args = Object.keys(params).map( function(k) {return "["+ params[k]+ "]"; }).join(",");
+        
         if( pathExists || fileWithContent )
         {
             content += generateMockFsTestCases(pathExists,fileWithContent,funcName, args);
@@ -146,6 +170,16 @@ function generateTestCases()
             content += generateMockFsTestCases(pathExists,!fileWithContent,funcName, args);
             content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, args);
         }
+        else if (phone && functionConstraints[funcName].params.length == 1)
+        {
+            console.log("Inside phone loop")
+            for( var i =0 ; i<1000 ; i++) 
+            {
+                result = padNumber(i) + "1111111"
+                content += "subject.{0}({1});\n".format(funcName, '"'+result+'"' ); 
+            }
+        }
+           
         // else
         // {
            
