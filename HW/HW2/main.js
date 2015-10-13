@@ -112,7 +112,9 @@ function generateTestCases()
     var content = "var subject = require('./subject.js')\nvar mock = require('mock-fs');\n";
     for ( var funcName in functionConstraints )
     {
+        
         var params = {};
+        var params2 = {}; //for file test
 
         console.log (funcName)
         // initialize params
@@ -122,6 +124,7 @@ function generateTestCases()
             var paramName = functionConstraints[funcName].params[i];
             //params[paramName] = '\'' + faker.phone.phoneNumber()+'\'';
             params[paramName] = ['\'\''];
+            params2[paramName] = '\'\'';
         }
 
         // update parameter values based on known constraints.
@@ -129,8 +132,8 @@ function generateTestCases()
         // Handle global constraints...
         var fileWithContent = _.some(constraints, {kind: 'fileWithContent' });
         var pathExists      = _.some(constraints, {kind: 'fileExists' });
-        var phone = _.contains(functionConstraints[funcName].params, "phoneNumber");
-        var arglist = [];
+        var phoneNumberExists = _.contains(functionConstraints[funcName].params, "phoneNumber");
+
         // plug-in values for parameters
         for( var c = 0; c < constraints.length; c++ )
         {
@@ -141,20 +144,21 @@ function generateTestCases()
             if( params.hasOwnProperty( constraint.ident ) )
             {
                 params[constraint.ident].push(constraint.value);
+                params2[constraint.ident] = constraint.value;
             }
 
             
         }
 
-        var args = Object.keys(params).map( function(k) {return "["+ params[k]+ "]"; }).join(",");
-        var list = [];
+        var args = Object.keys(params).map( function(k) {return params2[k]; }).join(",");
+        var arglist = [];
             
             for (var key in params )
             {
-                list.push(params[key]);
+                arglist.push(params[key]);
             }
 
-            combination = cartesianProductOf(list);
+            combination = cartesianProductOf(arglist);
 
             for (var i=0 ; i<combination.length; i++ )
             {
@@ -164,13 +168,16 @@ function generateTestCases()
         
         if( pathExists || fileWithContent )
         {
+            console.log(generateMockFsTestCases(pathExists,fileWithContent,funcName, args));
             content += generateMockFsTestCases(pathExists,fileWithContent,funcName, args);
+
             // Bonus...generate constraint variations test cases....
             content += generateMockFsTestCases(!pathExists,fileWithContent,funcName, args);
             content += generateMockFsTestCases(pathExists,!fileWithContent,funcName, args);
             content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, args);
         }
-        else if (phone && functionConstraints[funcName].params.length == 1)
+
+        else if (phoneNumberExists && functionConstraints[funcName].params.length == 1)
         {
             console.log("Inside phone loop")
             for( var i =0 ; i<1000 ; i++) 
@@ -180,11 +187,10 @@ function generateTestCases()
             }
         }
            
-        // else
-        // {
-           
-        //     content += "subject.{0}({1});\n".format(funcName, args );
-        // }
+        else
+        {
+            content += "subject.{0}({1});\n".format(funcName, args );
+        }
 
     }
 
@@ -253,7 +259,7 @@ function constraints(filePath)
                                 funcName: funcName
                             }));    
 
-                        var newValue = '"random1234"'
+                        var newValue = "'random1234"+rightHand+"'"
                         functionConstraints[funcName].constraints.push( 
                             new Constraint(
                             {
@@ -342,7 +348,7 @@ function constraints(filePath)
                         // get expression from original source code:
                         var expression = buf.substring(child.range[0], child.range[1]);
                         var rightHand = buf.substring(child.right.range[0], child.right.range[1])
-                        var newValue = '"random1234"'
+                        var newValue = "'random1234"+rightHand+"'"
                         functionConstraints[funcName].constraints.push( 
                         new Constraint(
                         {
