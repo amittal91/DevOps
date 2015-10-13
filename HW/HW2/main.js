@@ -133,6 +133,7 @@ function generateTestCases()
         var fileWithContent = _.some(constraints, {kind: 'fileWithContent' });
         var pathExists      = _.some(constraints, {kind: 'fileExists' });
         var phoneNumberExists = _.contains(functionConstraints[funcName].params, "phoneNumber");
+        var optionsExists = _.contains(functionConstraints[funcName].params, "options");
 
         // plug-in values for parameters
         for( var c = 0; c < constraints.length; c++ )
@@ -177,13 +178,21 @@ function generateTestCases()
             content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, args);
         }
 
-        else if (phoneNumberExists && functionConstraints[funcName].params.length == 1)
+        if (phoneNumberExists )
         {
             console.log("Inside phone loop")
             for( var i =0 ; i<1000 ; i++) 
             {
                 result = padNumber(i) + "1111111"
-                content += "subject.{0}({1});\n".format(funcName, '"'+result+'"' ); 
+                if (optionsExists)
+                {
+                    result = '"'+result+'","","'+i+'"'
+                    content += "subject.{0}({1});\n".format(funcName, result ); 
+                }
+                else 
+                {
+                    content += "subject.{0}({1});\n".format(funcName, '"'+result+'"' ); 
+                }
             }
         }
            
