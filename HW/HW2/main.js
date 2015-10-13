@@ -56,6 +56,7 @@ var functionConstraints =
 {
 }
 
+//Added an empty file
 var mockFileLibrary = 
 {
     pathExists:
@@ -67,6 +68,10 @@ var mockFileLibrary =
         pathContent: 
         {   
             file1: 'text content',
+        },
+        pathContentEmpty:
+        {
+            file2: '',
         }
     }
 };
@@ -74,6 +79,7 @@ var mockFileLibrary =
 var permArr = [],
   usedChars = [];
 
+// Takes a list of lists and returns lists of all possible cross products
 // Reference : Stack Overflow
 function cartesianProductOf(argument) {
     return _.reduce(argument, function(a, b) {
@@ -85,10 +91,12 @@ function cartesianProductOf(argument) {
     }, [ [] ]);
 };
 
-function padNumber(number) {
-    var numLength = number.length;
+// Takes in a number, converts it to string and pads it with 0 to convert a 3 digit string
+// Used to generate phone numbers having all possible area codes
+function padNumber(num) {
+    var numLength = num.toString().length;
     padDigits = 3 - (numLength % 3);
-    numberString = number.toString();
+    numberString = num.toString();
     if (padDigits == 1)
     {
         var result = "0" + numberString;
@@ -114,9 +122,6 @@ function generateTestCases()
     {
         
         var params = {};
-        var params2 = {}; //for file test
-
-        console.log (funcName)
         // initialize params
         for (var i =0; i < functionConstraints[funcName].params.length; i++ )
         {
@@ -124,7 +129,6 @@ function generateTestCases()
             var paramName = functionConstraints[funcName].params[i];
             //params[paramName] = '\'' + faker.phone.phoneNumber()+'\'';
             params[paramName] = ['\'\''];
-            params2[paramName] = '\'\'';
         }
 
         // update parameter values based on known constraints.
@@ -138,20 +142,32 @@ function generateTestCases()
         // plug-in values for parameters
         for( var c = 0; c < constraints.length; c++ )
         {
-            //console.log("For each param");
             var constraint = constraints[c];
-
 
             if( params.hasOwnProperty( constraint.ident ) )
             {
-                params[constraint.ident].push(constraint.value);
-                params2[constraint.ident] = constraint.value;
-            }
+                if (constraint.ident == "filePath")
+                {
+                    if( constraint.kind == "fileWithContent")
+                    {
+                        params[constraint.ident].push(constraint.value);
+                    }
+                }
+                else if (constraint.ident == "dir")
+                {
+                    if( constraint.kind == "fileExists")
+                    {
+                        params[constraint.ident].push(constraint.value);
+                    }
+                }
+                else {
 
-            
+                    params[constraint.ident].push(constraint.value);
+                }
+            }
         }
 
-        var args = Object.keys(params).map( function(k) {return params2[k]; }).join(",");
+        //var args = Object.keys(params).map( function(k) {return params2[k]; }).join(",");
         var arglist = [];
             
             for (var key in params )
@@ -163,24 +179,36 @@ function generateTestCases()
 
             for (var i=0 ; i<combination.length; i++ )
             {
-                content += "subject.{0}({1});\n".format(funcName, combination[i] );    
+                if(!pathExists || !fileWithContent)
+                {
+                    content += "subject.{0}({1});\n".format(funcName, combination[i] );
+                }    
+
+                if( pathExists || fileWithContent )
+                {
+                    var stringEmpty = false;
+                    for (var j=0; j<combination[i].length; j++ )
+                    {
+                        if (combination[i][j] == "''" && combination[i][j+1] == "''")
+                        {
+                            stringEmpty = true;
+                            break ;
+                        }
+                    }
+                    if(!stringEmpty)
+                    {
+                        content += generateMockFsTestCases(pathExists,fileWithContent,funcName, combination[i]);
+                        // Bonus...generate constraint variations test cases....
+                        content += generateMockFsTestCases(!pathExists,fileWithContent,funcName, combination[i]);
+                        content += generateMockFsTestCases(pathExists,!fileWithContent,funcName, combination[i]);
+                        content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, combination[i]);
+                    }
+                }
+
             }
-
-        
-        if( pathExists || fileWithContent )
-        {
-            console.log(generateMockFsTestCases(pathExists,fileWithContent,funcName, args));
-            content += generateMockFsTestCases(pathExists,fileWithContent,funcName, args);
-
-            // Bonus...generate constraint variations test cases....
-            content += generateMockFsTestCases(!pathExists,fileWithContent,funcName, args);
-            content += generateMockFsTestCases(pathExists,!fileWithContent,funcName, args);
-            content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, args);
-        }
 
         if (phoneNumberExists )
         {
-            console.log("Inside phone loop")
             for( var i =0 ; i<1000 ; i++) 
             {
                 result = padNumber(i) + "1111111"
@@ -195,17 +223,8 @@ function generateTestCases()
                 }
             }
         }
-           
-        else
-        {
-            content += "subject.{0}({1});\n".format(funcName, args );
-        }
-
     }
-
-
     fs.writeFileSync('test.js', content, "utf8");
-
 }
 
 function generateMockFsTestCases (pathExists,fileWithContent,funcName,args) 
@@ -283,17 +302,25 @@ function constraints(filePath)
                     {
                         // get expression from original source code:
                         var expression = buf.substring(child.range[0], child.range[1]);
-                        //var rightHand = buf.substring(child.right.range[0], child.right.range[1])
-                        //console.log ('Inside == \t Funcname' + funcName + "Child name" + child.left.name  + 'value =' + )
-                        //var righHand = child.left.arguments[0].value
-                        console.log(child.left.arguments[0].value)
-                        console.log(child.left.callee.object.name)
+                        var result = ''
+                        for (var i=0 ; i<=child.right.value; i++)
+                        {
+                            if (i == child.right.value)
+                            {
+                                result += child.left.arguments[0].value
+                            }
 
+                            else
+                            {
+                                result += "a";
+                            }
+                        }
+                        
                         functionConstraints[funcName].constraints.push( 
                             new Constraint(
                             {
                                 ident: child.left.callee.object.name,
-                                value: '"'+ child.left.arguments[0].value + '"',
+                                value: '"'+ result + '"',
                                 funcName: funcName
                             }));    
                     }
@@ -394,6 +421,17 @@ function constraints(filePath)
                                 operator : child.operator,
                                 expression: expression
                             }));
+
+                            functionConstraints[funcName].constraints.push( 
+                            new Constraint(
+                            {
+                                ident: params[p],
+                                value:  "'pathContentEmpty/file2'",
+                                funcName: funcName,
+                                kind: "fileWithContent",
+                                operator : child.operator,
+                                expression: expression
+                            }));
                         }
                     }
                 }
@@ -414,6 +452,17 @@ function constraints(filePath)
                                 value:  "'path/fileExists'",
                                 funcName: funcName,
                                 kind: "fileExists",
+                                operator : child.operator,
+                                expression: expression
+                            }));
+
+                            functionConstraints[funcName].constraints.push( 
+                            new Constraint(
+                            {
+                                ident: params[p],
+                                value:  "'pathContent/file1'",
+                                funcName: funcName,
+                                kind: "fileWithContent",
                                 operator : child.operator,
                                 expression: expression
                             }));
