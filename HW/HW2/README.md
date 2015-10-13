@@ -2,6 +2,6 @@
 
 ![](TestCoverage.png)
 
-![](TestCoverage2.png)
+![](TestCoverage-2.png)
 
 
