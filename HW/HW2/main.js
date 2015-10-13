@@ -136,10 +136,14 @@ function generateTestCases()
         // Handle global constraints...
         var fileWithContent = _.some(constraints, {kind: 'fileWithContent' });
         var pathExists      = _.some(constraints, {kind: 'fileExists' });
+        
+        //returns true if function contains a parameter called phoneNumber
         var phoneNumberExists = _.contains(functionConstraints[funcName].params, "phoneNumber");
+        //returns false if function contains a parameter called phoneNumber
         var optionsExists = _.contains(functionConstraints[funcName].params, "options");
 
         // plug-in values for parameters
+        //For each function, for each each constraint, we are creating a list of params.
         for( var c = 0; c < constraints.length; c++ )
         {
             var constraint = constraints[c];
@@ -167,51 +171,62 @@ function generateTestCases()
             }
         }
 
-        //var args = Object.keys(params).map( function(k) {return params2[k]; }).join(",");
+        //arglist would contatin a list of lists of params for each function. e.g. if a function contains 3 params
+        // x, y, z with values x :[ 1,2] , y: [3,4], z[5,6], then arglist would contain arglist = [[1,2],[3,4],[5,6]]
         var arglist = [];
             
-            for (var key in params )
+        for (var key in params )
+        {
+            arglist.push(params[key]);
+        }
+
+        // This would return the cross product of all the lists present in arglist. For the above example the result
+        // would be something like [[1,3,5] , [1,4,6] , [2,3,5],........]
+        combination = cartesianProductOf(arglist);
+
+        for (var i=0 ; i<combination.length; i++ )
+        {
+            //Checks if this function is not for the file function
+            if(!pathExists || !fileWithContent)
             {
-                arglist.push(params[key]);
-            }
+                content += "subject.{0}({1});\n".format(funcName, combination[i] );
+            }    
 
-            combination = cartesianProductOf(arglist);
 
-            for (var i=0 ; i<combination.length; i++ )
+            //checks if this function is the file function
+            if( pathExists || fileWithContent )
             {
-                if(!pathExists || !fileWithContent)
+                var stringEmpty = false;
+                // checks if both the params dir and filepath passed to the function are empty.
+                // If they are empty then doesn't pass it to content because passing empty parameters
+                // causes a bad file descriptor error.
+                for (var j=0; j<combination[i].length; j++ )
                 {
-                    content += "subject.{0}({1});\n".format(funcName, combination[i] );
-                }    
-
-                if( pathExists || fileWithContent )
-                {
-                    var stringEmpty = false;
-                    for (var j=0; j<combination[i].length; j++ )
+                    if (combination[i][j] == "''" && combination[i][j+1] == "''")
                     {
-                        if (combination[i][j] == "''" && combination[i][j+1] == "''")
-                        {
-                            stringEmpty = true;
-                            break ;
-                        }
-                    }
-                    if(!stringEmpty)
-                    {
-                        content += generateMockFsTestCases(pathExists,fileWithContent,funcName, combination[i]);
-                        // Bonus...generate constraint variations test cases....
-                        content += generateMockFsTestCases(!pathExists,fileWithContent,funcName, combination[i]);
-                        content += generateMockFsTestCases(pathExists,!fileWithContent,funcName, combination[i]);
-                        content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, combination[i]);
+                        stringEmpty = true;
+                        break ;
                     }
                 }
-
+                if(!stringEmpty)
+                {
+                    content += generateMockFsTestCases(pathExists,fileWithContent,funcName, combination[i]);
+                    // Bonus...generate constraint variations test cases....
+                    content += generateMockFsTestCases(!pathExists,fileWithContent,funcName, combination[i]);
+                    content += generateMockFsTestCases(pathExists,!fileWithContent,funcName, combination[i]);
+                    content += generateMockFsTestCases(!pathExists,!fileWithContent,funcName, combination[i]);
+                }
             }
 
+        }
+        // If the function is any of the function with phoneNumber as paramter, then generate phone numbers with all
+        // possible area codes.
         if (phoneNumberExists )
         {
             for( var i =0 ; i<1000 ; i++) 
             {
                 result = padNumber(i) + "1111111"
+                //Checks if for the function options parameter also exists. If yes then pass in some dummy option as well.
                 if (optionsExists)
                 {
                     result = '"'+result+'","","'+i+'"'
