@@ -21,6 +21,7 @@ app.use(function(req, res, next)
 });
 
 
+
 app.post('/upload',[ multer({ dest: './uploads/'}), function(req, res){
    console.log(req.body) // form fields
    console.log(req.files) // form files
@@ -30,23 +31,26 @@ app.post('/upload',[ multer({ dest: './uploads/'}), function(req, res){
     fs.readFile( req.files.image.path, function (err, data) {
          if (err) throw err;
          var img = new Buffer(data).toString('base64');
-         console.log(img);
-     });
+         
+         // Store the image in a redis queue
+         client.lpush('imageQueue',img)
+    });
  }
 
    res.status(204).end()
 }]);
 
+
+
 app.get('/meow', function(req, res) {
- {
-     if (err) throw err
+     
      res.writeHead(200, {'content-type':'text/html'});
-     items.forEach(function (imagedata) 
-     {
-         res.write("<h1>\n<img src='data:my_pic.jpg;base64,"+imagedata+"'/>");
-     });
-     res.end();
- }
+
+     // Pop the image from the redis queue
+     client.lpop('imageQueue',function(err,value){ 
+        res.write("<h1>\n<img src='data:my_pic.jpg;base64,"+value+"'/>");
+        res.end();
+    })
 })
 
 //HTTP SERVER
