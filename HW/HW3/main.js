@@ -3,10 +3,11 @@ var multer  = require('multer')
 var express = require('express')
 var fs      = require('fs')
 var app = express()
+var proxy_app = express()
 // REDIS
 var client = redis.createClient(6379, '127.0.0.1', {})
-var queueLength
-var recentValues 
+var localhost = "http://localhost:"
+
 ///////////// WEB ROUTES
 
 // Add hook to make it easier to get all visited URLS.
@@ -14,6 +15,7 @@ app.use(function(req, res, next)
 {
     
     client.lpush('queue',req.url)
+
     // Trimming the queue to hold only the most recent 5 entries.
     client.ltrim('queue',0,4)
     
@@ -21,11 +23,18 @@ app.use(function(req, res, next)
 });
 
 
+// Proxy server setup
+proxy_app.use(function(req, res, next)
+{
+    client.rpoplpush('proxyQueue','proxyQueue', function(err,value) {
+        console.log("Redirected to:" + value )
+        res.redirect(value+req.url)
+    })
+})
+
 
 app.post('/upload',[ multer({ dest: './uploads/'}), function(req, res){
-   console.log(req.body) // form fields
-   console.log(req.files) // form files
-
+   
    if( req.files.image )
    {
     fs.readFile( req.files.image.path, function (err, data) {
@@ -54,13 +63,39 @@ app.get('/meow', function(req, res) {
 })
 
 //HTTP SERVER
-var server = app.listen(3000, function () {
+var server1 = app.listen(3000, function () {
 
-    var host = server.address().address
-    var port = server.address().port
+    var host1 = server1.address().address
+    var port1 = server1.address().port
 
-    console.log('Example app listening at http://%s:%s', host, port)
+    console.log('Example app listening at http://%s:%s', host1, port1)
 })
+
+// Additional service instance
+var server2 = app.listen(3001, function () {
+
+    var host2 = server2.address().address
+    var port2 = server2.address().port
+
+    console.log('Example app listening at http://%s:%s', host2, port2)
+    createProxyQueue()
+})
+
+// Proxy server listening at port 80.
+// ******NOTE******** Run "sudo node main.js" to bind to port 80 since you have to
+// run the program with CAP_NET_BIND_SERVICE capabilities in order to bind to ports
+// less than 1024 on Linux systems. "root" privilege will contain this. - 
+// SOURCE -http://stackoverflow.com/questions/9526500/node-js-how-can-i-remove-the-port-from-the-url
+
+var proxy_server = proxy_app.listen(80, function () {
+
+    var proxy_host = proxy_server.address().address
+    var proxy_port = proxy_server.address().port
+
+    console.log('Proxy server listening at http://%s:%s', proxy_host, proxy_port)
+})
+
+
 
 app.get('/', function(req, res) {
     res.send('hello world')
@@ -80,3 +115,14 @@ app.get('/get', function(req, res) {
 app.get('/recent', function(req, res) {
     client.lrange('queue',0,4,function(err,value){ res.send("The 5 most recent visited sites are: " + value)} )
 })
+
+// Deleting the proxyQueue in redis cache
+
+function createProxyQueue() {
+    client.del('proxyQueue', function() {
+        client.lpush('proxyQueue',localhost+"3000",function(){
+            client.lpush('proxyQueue',localhost+"3001")
+        })
+    })
+    
+}
