@@ -13,9 +13,8 @@ var recentValues
 app.use(function(req, res, next) 
 {
     
-
-    client.lpush('queue',req.url, function(err,value){ queueLength  = value})
-    console.log("Length="+ queueLength)
+    client.lpush('queue',req.url)
+    // Trimming the queue to hold only the most recent 5 entries.
     client.ltrim('queue',0,4)
     
     next(); // Passing the request to the next handler in the stack.
@@ -65,7 +64,6 @@ app.get('/', function(req, res) {
 
 app.get('/set', function(req, res) {
 
-
     client.set("newKey", "this message will self-destruct in 10 seconds");
     client.expire("newKey",10)
     res.send('Key setting successful')
@@ -75,10 +73,6 @@ app.get('/get', function(req, res) {
     client.get("newKey", function(err,value){ res.send(value)});
 })
 
-app.get('/get', function(req, res) {
-    client.get("newKey", function(err,value){ res.send(value)});
-})
-
 app.get('/recent', function(req, res) {
-    client.lrange('queue',0,4,function(err,value){ res.send(value)} )
+    client.lrange('queue',0,4,function(err,value){ res.send("The 5 most recent visited sites are: " + value)} )
 })
