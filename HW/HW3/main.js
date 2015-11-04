@@ -57,8 +57,15 @@ app.get('/meow', function(req, res) {
 
      // Pop the image from the redis queue
      client.lpop('imageQueue',function(err,value){ 
-        res.write("<h1>\n<img src='data:my_pic.jpg;base64,"+value+"'/>");
-        res.end();
+        
+        if (!value) {
+            res.write("The image Queue is empty....!")
+            res.end()
+        }
+        else {
+            res.write("<h1>\n<img src='data:my_pic.jpg;base64,"+value+"'/>");
+            res.end();
+        }
     })
 })
 
