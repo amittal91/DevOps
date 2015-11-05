@@ -3,7 +3,8 @@ var multer  = require('multer')
 var express = require('express')
 var fs      = require('fs')
 var app = express()
-var proxy_app = express()
+var http = require('http')
+var proxy_app = require('http-proxy')
 // REDIS
 var client = redis.createClient(6379, '127.0.0.1', {})
 var localhost = "http://localhost:"
@@ -21,16 +22,6 @@ app.use(function(req, res, next)
     
     next(); // Passing the request to the next handler in the stack.
 });
-
-
-// Proxy server setup
-proxy_app.use(function(req, res, next)
-{
-    client.rpoplpush('proxyQueue','proxyQueue', function(err,value) {
-        console.log("Redirected to:" + value )
-        res.redirect(value+req.url)
-    })
-})
 
 
 app.post('/upload',[ multer({ dest: './uploads/'}), function(req, res){
@@ -91,18 +82,15 @@ var server2 = app.listen(3001, function () {
 // Proxy server listening at port 80.
 // ******NOTE******** Run "sudo node main.js" to bind to port 80 since you have to
 // run the program with CAP_NET_BIND_SERVICE capabilities in order to bind to ports
-// less than 1024 on Linux systems. "root" privilege will contain this. - 
+// less than 1024 on Linux systems. "root" privilege will contain this.
 // SOURCE -http://stackoverflow.com/questions/9526500/node-js-how-can-i-remove-the-port-from-the-url
-
-var proxy_server = proxy_app.listen(80, function () {
-
-    var proxy_host = proxy_server.address().address
-    var proxy_port = proxy_server.address().port
-
-    console.log('Proxy server listening at http://%s:%s', proxy_host, proxy_port)
-})
-
-
+http.createServer(function(req,res) {
+    client.rpoplpush('proxyQueue','proxyQueue', function(err,value) {
+        console.log("Redirecting to "+localhost+value+req.url)
+        var proxy_server = proxy_app.createProxyServer({target: localhost + value})
+        proxy_server.web(req,res)
+    })
+}).listen(80)
 
 app.get('/', function(req, res) {
     res.send('hello world')
@@ -127,9 +115,8 @@ app.get('/recent', function(req, res) {
 
 function createProxyQueue() {
     client.del('proxyQueue', function() {
-        client.lpush('proxyQueue',localhost+"3000",function(){
-            client.lpush('proxyQueue',localhost+"3001")
+        client.lpush('proxyQueue',"3000",function(){
+            client.lpush('proxyQueue',"3001")
         })
     })
-    
 }
