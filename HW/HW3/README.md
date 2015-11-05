@@ -27,6 +27,14 @@ An HTTP proxy server was setup at port 80.
 > SOURCE -http://stackoverflow.com/questions/9526500/node-js-how-can-i-remove-the-port-from-the-url
 
 
+###Screencast###
+
+[Link](https://youtu.be/HUSYqnXejdE)
+
+
+> We could have used redirect of express module to redirect our requests through proxy server but it has a 
+> limitaion of sending requests as GET. A status code of 307 could help us mitigate that issue but it needs some
+> deeper understanding of the protocol.
 
 
 
