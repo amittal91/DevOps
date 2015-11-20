@@ -1,0 +1,9 @@
+#!/bin/bash
+GIT_WORK_TREE=/deploy/green-www/ git checkout -f
+docker pull localhost:5000/task3:latest
+docker stop greenApp
+docker rm greenApp
+#docker rmi localhost:5000/task3:current
+#docker tag localhost:5000/task3:latest localhost:5000/task3:current
+docker run -p 9001:8080 -d --name greenApp hw4-task3
+
