@@ -1,0 +1,16 @@
+
+
+Task1
+
+Container 1
+
+docker stop $(docker ps -a -q)
+docker rm $(docker ps -a -q)
+
+sudo docker build -t container1 .
+sudo docker run -d --name container1 container1
+
+Container 2
+
+sudo docker build -t container2 .
+sudo docker run --link container1:container1 --rm -it --name container2 container2 curl container1:9001
