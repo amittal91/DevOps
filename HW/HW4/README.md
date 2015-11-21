@@ -10,8 +10,15 @@
 **Steps**
 * Create a digital ocean droplet with Ubuntu image
 * Install docker using `curl -sSL https://get.docker.com/ | sh`
-* Create
-
+* Create the following directory structure
+```
+  /FileIO/
+    |__Container1
+    |       |______Dockerfile
+    |
+    |__Container2
+            |______Dockerfile
+```
 ###Screencast
 
 [Link to video](https://youtu.be/POmZ-JjMhDM)
