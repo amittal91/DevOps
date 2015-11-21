@@ -44,6 +44,13 @@ Creates and runs a linked container which accesses the container 1 over network
 
 **Steps**
 * Create 2 digital ocean droplets with ubuntu.
+* Install docker using `curl -sSL https://get.docker.com/ | sh` in both of them
+* Install docker compose using :
+```
+curl -L https://github.com/docker/compose/releases/download/1.5.1/docker-compose-`uname -s`-`uname -m` > /usr/local/bin/docker-compose
+
+chmod +x /usr/local/bin/docker-compose
+```
 * In 1st droplet create the following directory structure.
 ```
   /Server
@@ -79,6 +86,16 @@ OK
 redis 172.17.0.2:6379>GET mykey
 "hello"
 ```
+
+3) **Docker Deploy**: Extend the deployment workshop to run a docker deployment process.
+
+* A commit will build a new docker image.
+* Push to local registery.
+* Deploy the dockerized [simple node.js App](https://github.com/CSC-DevOps/App) to blue or green slice.
+* Add appropriate hook commands to pull from registery, stop, and restart containers.
+
+**Steps**
+* Create a digital ocean droplet with ubuntu
 ###Screencast
 
 [Link to video](https://youtu.be/POmZ-JjMhDM)
