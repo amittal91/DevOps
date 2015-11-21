@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "---------Removing existing docker image---------" 
+docker rmi hw4-task3
+echo "---------Removing existing docker image from registry ---------"
+docker rmi localhost:5000/task3:latest
+echo "---------Building docker image---------"
+docker build -t hw4-task3 .
+echo "---------Tagging the built docker image to the registry---------"
+docker tag -f hw4-task3 localhost:5000/task3:latest
+echo "---------Pushing the tagged docker image to the registry---------"
+docker push localhost:5000/task3:latest
+

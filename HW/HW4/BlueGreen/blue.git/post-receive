@@ -3,6 +3,4 @@ GIT_WORK_TREE=/deploy/blue-www/ git checkout -f
 docker pull localhost:5000/task3:latest
 docker stop blueApp
 docker rm blueApp
-#docker rmi localhost:5000/task3:current
-#docker tag localhost:5000/task3:latest localhost:5000/task3:current
 docker run -p 9000:8080 -d --name blueApp hw4-task3
