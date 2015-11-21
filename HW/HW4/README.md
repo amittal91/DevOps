@@ -71,14 +71,14 @@ where redis_client is the name of the container. It would be linked to an ambass
 Redis-server(Host 1) <------> Ambassador(Host 1) <------> Ambassador(Host 2)<------> Redis-cli(Host 2) u
 ```
 * From the redis cli on the second host, run 
-'''
+```
 redis 172.17.0.2:6379>ping
 PONG
 redis 172.17.0.2:6379>SET mykey "hello"
 OK
 redis 172.17.0.2:6379>GET mykey
 "hello"
-'''
+```
 ###Screencast
 
 [Link to video](https://youtu.be/POmZ-JjMhDM)
