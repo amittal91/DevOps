@@ -7,6 +7,10 @@
 * Use socat to map file access to read file container and expose over port 9001 (hint can use SYSTEM + cat).
 * Use a linked container that access that file over network. The linked container can just use a command such as curl to access data from other container.
 
+**Steps**
+* Create a digital ocean droplet with Ubuntu image
+* Install docker using `curl -sSL https://get.docker.com/ | sh`
+* Create
 
 ###Screencast
 
