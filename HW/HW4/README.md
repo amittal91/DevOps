@@ -98,6 +98,7 @@ redis 172.17.0.2:6379>GET mykey
 **Steps**
 * Create a digital ocean droplet with ubuntu.
 * Install git using `sudo apt-get install git`
+* Install docker using `curl -sSL https://get.docker.com/ | sh`
 * Install nodejs using `sudo apt-get install nodejs`
 * Create a symling to use nodejs as node using `ln -s /usr/bin/nodejs /usr/bin/node`
 * Update npm using `sudo npm install npm -g`
