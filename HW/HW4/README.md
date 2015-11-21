@@ -24,7 +24,11 @@
 sudo docker build -t container1 .
 sudo docker run -d --name container1 container1
 ```
-* 
+* Inside Container2 runt the following commands:
+```
+sudo docker build -t container2 .
+sudo docker run --link container1:container1 --rm -it --name container2 container2 curl container1:9001
+```
 ###Screencast
 
 [Link to video](https://youtu.be/POmZ-JjMhDM)
