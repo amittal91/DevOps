@@ -111,6 +111,18 @@ redis 172.17.0.2:6379>GET mykey
 chmod +x /deploy/blue.git/hooks/post-receive
 chmod +x /deploy/green.git/hooks/post-receive
 ```
+* Create a local registry to push docker images through the following command `docker run -d -p 5000:5000 --restart=always --name registry registry:2`
+* Go to /App , make changes in main.js and commit them.
+* A docker container would be built and pushed into local registry.
+* Do a git push in either the green slice or the blue sliece using :
+
+```
+git push green master 
+git push blue master
+```
+* The post-receive hook would be invoked and the container would be pulled and deployed.
+* Check the result by going to the http://PUBLIC_IP_OF_DROPLET:9000 or http://PUBLIC_IP_OF_DROPLET:9001 depending where you have git pushed.
+* Changing the app main.js again and commiting it and pushing it to a different slice would deploy the app on the port referred by that slice.
 
 ###Screencast
 
