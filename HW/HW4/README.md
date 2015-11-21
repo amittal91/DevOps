@@ -24,11 +24,14 @@
 sudo docker build -t container1 .
 sudo docker run -d --name container1 container1
 ```
-* Inside Container2 runt the following commands:
+This exposes the port 9001 with socat to display content of a text file.
+
+* Inside Container2 run the following commands:
 ```
 sudo docker build -t container2 .
 sudo docker run --link container1:container1 --rm -it --name container2 container2 curl container1:9001
 ```
+Creates and runs a linked container which accesses the container 1 over network
 ###Screencast
 
 [Link to video](https://youtu.be/POmZ-JjMhDM)
