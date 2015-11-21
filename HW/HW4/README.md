@@ -12,7 +12,7 @@
 * Install docker using `curl -sSL https://get.docker.com/ | sh`
 * Create the following directory structure
 ```
-  /FileIO/
+  /FileIO
     |__Container1
     |       |______Dockerfile
     |
