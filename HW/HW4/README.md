@@ -1,4 +1,12 @@
-#Advanced Docker
+# Homework 4 - Advanced Docker
+
+### Task 1
+1) **File IO**: You want to create a container for a legacy application. You succeed, but you need access to a file that the legacy app creates.
+
+* Create a container that runs a command that outputs to a file.
+* Use socat to map file access to read file container and expose over port 9001 (hint can use SYSTEM + cat).
+* Use a linked container that access that file over network. The linked container can just use a command such as curl to access data from other container.
+
 
 ###Screencast
 
