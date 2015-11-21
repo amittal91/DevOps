@@ -19,6 +19,12 @@
     |__Container2
             |______Dockerfile
 ```
+* Inside Container1 run the following commands:
+```
+sudo docker build -t container1 .
+sudo docker run -d --name container1 container1
+```
+* 
 ###Screencast
 
 [Link to video](https://youtu.be/POmZ-JjMhDM)
