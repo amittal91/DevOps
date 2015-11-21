@@ -86,6 +86,7 @@ OK
 redis 172.17.0.2:6379>GET mykey
 "hello"
 ```
+### Task 3
 
 3) **Docker Deploy**: Extend the deployment workshop to run a docker deployment process.
 
