@@ -95,7 +95,23 @@ redis 172.17.0.2:6379>GET mykey
 * Add appropriate hook commands to pull from registery, stop, and restart containers.
 
 **Steps**
-* Create a digital ocean droplet with ubuntu
+* Create a digital ocean droplet with ubuntu.
+* Install git using `sudo apt-get install git`
+* Install nodejs using `sudo apt-get install nodejs`
+* Create a symling to use nodejs as node using `ln -s /usr/bin/nodejs /usr/bin/node`
+* Update npm using `sudo npm install npm -g`
+* Clone the [simple node.js App](https://github.com/CSC-DevOps/App) in /App directory
+* Follow the [Deployment Workshop](https://github.com/CSC-DevOps/Deployment) to set up a blue-green deployment structure
+* Add a [post-commit](https://github.com/amittal91/DevOps/blob/master/HW/HW4/BlueGreen/App/post-commit) hook in /App/.git/hooks/
+* Change the executable permissions by using `chmod +x /App/.git/hooks/post-commit`
+* Go to the /deploy/blue.git/hooks directory and add this [post-receive](https://github.com/amittal91/DevOps/blob/master/HW/HW4/BlueGreen/blue.git/post-receive) hook
+* Go to the /deploy/green.git/hooks directory and add this [post-receive](https://github.com/amittal91/DevOps/blob/master/HW/HW4/BlueGreen/green.git/post-receive) hook
+* Change the executable permissions by using 
+```
+chmod +x /deploy/blue.git/hooks/post-receive
+chmod +x /deploy/green.git/hooks/post-receive
+```
+
 ###Screencast
 
 [Link to video](https://youtu.be/POmZ-JjMhDM)
